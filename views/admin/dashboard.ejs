@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Management System</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css"
+    />
+    <style>
+      /* Additional styles for customization */
+      body {
+        background-color: #f8f9fa;
+      }
+      .container {
+        margin-top: 30px;
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .student-table {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow-x: auto;
+      }
+      .student-table th,
+      .student-table td {
+        padding: 12px 16px;
+        vertical-align: middle;
+      }
+      .student-table th {
+        background-color: #007bff;
+        color: #fff;
+        font-weight: bold;
+      }
+      .student-table td {
+        border-bottom: 1px solid #dee2e6;
+      }
+      .student-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+      .student-table .btn {
+        margin-right: 5px;
+      }
+      .modal-header {
+        background-color: #007bff;
+        color: white;
+      }
+      .btn-close {
+        color: white;
+      }
+      .btn-primary,
+      .btn-danger {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Student List</h1>
+      <div class="d-flex justify-content-between mb-3">
+        <button
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#createStudentModal"
+        >
+          Create New Student
+        </button>
+        <form action="/admin/logout" method="get">
+          <button id="logoutButton" class="btn btn-danger">Logout</button>
+        </form>
+      </div>
+      <!-- Student Table -->
+      <div class="student-table table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Grade</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="studentList">
+            <!-- Students will be dynamically loaded here -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Modal for Create New Student -->
+      <div
+        class="modal fade"
+        id="createStudentModal"
+        tabindex="-1"
+        aria-labelledby="createStudentModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="createStudentModalLabel">
+                Create New Student
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="createStudentForm">
+                <div class="mb-3">
+                  <label for="studentName" class="form-label">Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="studentName"
+                    name="name"
+                    required
+                    aria-describedby="studentNameFeedback"
+                  />
+                  <div id="studentNameFeedback" class="invalid-feedback">
+                    Please provide a valid name.
+                  </div>
+                  <div id="studentNameFeedback" class="valid-feedback">
+                    Looks good!
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="studentEmail" class="form-label">Email</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="studentEmail"
+                    name="email"
+                    required
+                    aria-describedby="studentEmailFeedback"
+                  />
+                  <div id="studentEmailFeedback" class="invalid-feedback">
+                    Please provide a valid email.
+                  </div>
+                  <div id="studentEmailFeedback" class="valid-feedback">
+                    Looks good!
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="studentGrade" class="form-label">Grade</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="studentGrade"
+                    name="grade"
+                    required
+                    aria-describedby="studentGradeFeedback"
+                  />
+                  <div id="studentGradeFeedback" class="invalid-feedback">
+                    Please provide a valid grade.
+                  </div>
+                  <div id="studentGradeFeedback" class="valid-feedback">
+                    Looks good!
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="studentPassword" class="form-label"
+                    >Password</label
+                  >
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="studentPassword"
+                    name="password"
+                    required
+                    aria-describedby="studentPasswordFeedback"
+                  />
+                  <div id="studentPasswordFeedback" class="invalid-feedback">
+                    Please provide a password.
+                  </div>
+                  <div id="studentPasswordFeedback" class="valid-feedback">
+                    Password looks good!
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  Create Student
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal for Editing Student -->
+      <div
+        class="modal fade"
+        id="editStudentModal"
+        tabindex="-1"
+        aria-labelledby="editStudentModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editStudentModalLabel">
+                Edit Student
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form id="editStudentForm">
+                <div class="mb-3">
+                  <label for="editStudentName" class="form-label">Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="editStudentName"
+                    name="name"
+                    required
+                    aria-describedby="editStudentNameFeedback"
+                  />
+                  <div id="editStudentNameFeedback" class="invalid-feedback">
+                    Please provide a valid name.
+                  </div>
+                  <div id="editStudentNameFeedback" class="valid-feedback">
+                    Looks good!
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <input
+                    type="hidden"
+                    class="form-control"
+                    id="editStudentEmail"
+                    name="email"
+                    required
+                    disabled
+                    aria-describedby="editStudentEmailFeedback"
+                  />
+                  <div id="editStudentEmailFeedback" class="invalid-feedback">
+                    Please provide a valid email.
+                  </div>
+                  <div id="editStudentEmailFeedback" class="valid-feedback">
+                    Looks good!
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="editStudentGrade" class="form-label">Grade</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="editStudentGrade"
+                    name="grade"
+                    required
+                    aria-describedby="editStudentGradeFeedback"
+                  />
+                  <div id="editStudentGradeFeedback" class="invalid-feedback">
+                    Please provide a valid grade.
+                  </div>
+                  <div id="editStudentGradeFeedback" class="valid-feedback">
+                    Looks good!
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <input
+                    type="hidden"
+                    class="form-control"
+                    id="editStudentPassword"
+                    name="password"
+                    required
+                    disabled
+                    aria-describedby="editStudentPasswordFeedback"
+                  />
+                  <div
+                    id="editStudentPasswordFeedback"
+                    class="invalid-feedback"
+                  >
+                    Please provide a password.
+                  </div>
+                  <div id="editStudentPasswordFeedback" class="valid-feedback">
+                    Password looks good!
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  Update Student
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+      async function fetchStudents() {
+        try {
+          const response = await axios.get("/students");
+          const students = response.data;
+          const studentListDiv = document.getElementById("studentList");
+          studentListDiv.innerHTML = "";
+
+          students.forEach((student) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${student.name}</td>
+              <td>${student.email}</td>
+              <td>${student.grade}</td>
+              <td>
+                <button
+                  class="btn btn-warning btn-edit"
+                  data-bs-toggle="modal"
+                  data-bs-target="#editStudentModal"
+                  data-id="${student._id}"
+                  data-name="${student.name}"
+                  data-email="${student.email}"
+                  data-grade="${student.grade}"
+                >
+                  Edit
+                </button>
+                <button
+                  class="btn btn-danger btn-delete"
+                  onclick="deleteStudent('${student._id}')"
+                >
+                Delete
+                </button>
+                </td>
+                `;
+            studentListDiv.appendChild(row);
+          });
+        } catch (error) {
+          console.error("Error fetching students:", error);
+        }
+      }
+
+      async function deleteStudent(studentId) {
+        try {
+          const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "This action cannot be undone!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "Cancel",
+            reverseButtons: true,
+          });
+
+          if (result.isConfirmed) {
+            await axios.delete(`/students/${studentId}`);
+            fetchStudents();
+            Swal.fire("Deleted!", "The student has been deleted.", "success");
+          } else {
+            Swal.fire("Cancelled", "The student was not deleted.", "error");
+          }
+        } catch (error) {
+          console.error("Error deleting student:", error);
+          Swal.fire(
+            "Error!",
+            "There was an issue deleting the student.",
+            "error"
+          );
+        }
+      }
+
+      const editModal = document.getElementById("editStudentModal");
+
+      // Populating values in the Edit Modal
+      editModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget; // Button that triggered the modal
+        const studentId = button.getAttribute("data-id");
+        const studentName = button.getAttribute("data-name");
+        const studentEmail = button.getAttribute("data-email");
+        const studentGrade = button.getAttribute("data-grade");
+
+        const nameField = editModal.querySelector("#editStudentName");
+        const emailField = editModal.querySelector("#editStudentEmail");
+        const gradeField = editModal.querySelector("#editStudentGrade");
+
+        // Setting values of input fields in the modal
+        nameField.value = studentName;
+        emailField.value = studentEmail;
+        gradeField.value = studentGrade;
+
+        // Set studentId in modal data attribute for reference during form submission
+        editModal.setAttribute("data-id", studentId);
+      });
+
+      const createStudentForm = document.getElementById("createStudentForm");
+      createStudentForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const name = document.getElementById("studentName").value;
+        const email = document.getElementById("studentEmail").value;
+        const grade = document.getElementById("studentGrade").value;
+        const password = document.getElementById("studentPassword").value;
+
+        // Check if the form is valid before sending the request
+        if (!validateCreateForm()) {
+          alert("Please fill out the form correctly before submitting.");
+          return;
+        }
+
+        try {
+          await axios.post("/students", { name, email, grade, password });
+
+          // Show success SweetAlert2 message
+          Swal.fire({
+            title: "Success!",
+            text: "The student has been created.",
+            icon: "success",
+            confirmButtonText: "Okay",
+          });
+
+          // Fetch students to update the list
+          fetchStudents();
+
+          // Close the modal after successful creation
+          document
+            .getElementById("createStudentModal")
+            .querySelector(".btn-close")
+            .click();
+        } catch (error) {
+          console.error("Error creating student:", error);
+
+          // Show error SweetAlert2 message
+          Swal.fire({
+            title: "Error!",
+            text: "There was an issue creating the student.",
+            icon: "error",
+            confirmButtonText: "Try Again",
+          });
+        }
+      });
+
+      // Real-time validation for the create student form
+      document
+        .getElementById("studentName")
+        .addEventListener("input", validateCreateForm);
+      document
+        .getElementById("studentEmail")
+        .addEventListener("input", validateCreateForm);
+      document
+        .getElementById("studentGrade")
+        .addEventListener("input", validateCreateForm);
+      document
+        .getElementById("studentPassword")
+        .addEventListener("input", validateCreateForm);
+
+      const editStudentForm = document.getElementById("editStudentForm");
+      editStudentForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const name = document.getElementById("editStudentName").value;
+        const grade = document.getElementById("editStudentGrade").value;
+        const studentId = editModal.getAttribute("data-id");
+
+        // Check if the form is valid before sending the request
+        if (!validateEditForm()) {
+          alert("Please fill out the form correctly before submitting.");
+          return;
+        }
+
+        try {
+          await axios.put(`/students/${studentId}`, { name, grade });
+
+          fetchStudents();
+          document
+            .getElementById("editStudentModal")
+            .querySelector(".btn-close")
+            .click();
+        } catch (error) {
+          console.error("Error updating student:", error);
+        }
+      });
+
+      // Real-time validation for the edit student form
+      document
+        .getElementById("editStudentName")
+        .addEventListener("input", validateEditForm);
+      document
+        .getElementById("editStudentGrade")
+        .addEventListener("input", validateEditForm);
+
+      // Real-time validation functions
+      function validateCreateForm() {
+        const name = document.getElementById("studentName");
+        const email = document.getElementById("studentEmail");
+        const grade = document.getElementById("studentGrade");
+        const password = document.getElementById("studentPassword");
+
+        const nameValid = name.value.length >= 3;
+        const emailValid =
+          /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email.value);
+        const gradeValid = grade.value.trim() !== "";
+        const passwordValid = password.value.length >= 6;
+
+        toggleValidationClass(name, nameValid);
+        toggleValidationClass(email, emailValid);
+        toggleValidationClass(grade, gradeValid);
+        toggleValidationClass(password, passwordValid);
+
+        return nameValid && emailValid && gradeValid && passwordValid;
+      }
+
+      function validateEditForm() {
+        const name = document.getElementById("editStudentName");
+        const grade = document.getElementById("editStudentGrade");
+
+        const nameValid = name.value.length >= 3;
+        const gradeValid = grade.value.trim() !== "";
+
+        toggleValidationClass(name, nameValid);
+        toggleValidationClass(grade, gradeValid);
+
+        return nameValid && gradeValid;
+      }
+
+      // Function to toggle validation classes for real-time feedback
+      function toggleValidationClass(input, isValid) {
+        if (isValid) {
+          input.classList.remove("is-invalid");
+          input.classList.add("is-valid");
+        } else {
+          input.classList.remove("is-valid");
+          input.classList.add("is-invalid");
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchStudents();
+      });
+    </script>
+  </body>
+</html>
